@@ -2,7 +2,23 @@ class FoodCommand {
     constructor(options) {
         Object.assign(this, options);
         this.rendered = false;
+        this.audio_url = "https://orangefreesounds.com/wp-content/uploads/2022/07/Clock-chimes-sounds.mp3?_=1";
+        this.alarm_status = false;
+        this.alarm_audio = new Audio(this.audio_url);
+        this.intervalID;
         this.item = null;
+        this.previewState = "Attending";
+        this.state_time_elapsed = 0;
+        this.state_alert_time = {
+            "Attending": 0.5,
+            "Whiting": 1,
+            "Processing": 0.5,
+            "Completed": 1,
+            "Delivering": 0.5,
+            "Delivered": 1,
+            "Invoiced": 0.5
+        };
+        this.sound_status = false;
         this.render();
         RM.object(this.identifier + this.process_manage.identifier, this);
     }
@@ -140,19 +156,69 @@ class FoodCommand {
     }
 
     show_alert_time_elapsed(time_elapsed) {
-        const five_minuts = 60 * 5;
-        const fifteen_minuts = 60 * 15;
+        // this.state_time_elapsed
+        // const five_minuts = 60 * 5;
+        // const fifteen_minuts = 60 * 15;
+        const alert_time = this.state_alert_time[this.data.process_status_data.status_message];
+        console.log("alert time", this.state_alert_time, alert_time);
+        const five_minuts = 60 * alert_time;
+        const fifteen_minuts = 60 * alert_time * 2;
+        this.state_time_elapsed++;
 
-        if (time_elapsed <= five_minuts) {
+        // test 1 min
+        // if(time_elapsed > 60 && !this.alarm_status) {
+        //     this.alarm_status = true;
+        //     this.play_alarm_sound(audio_url, 1);
+        // }
+         // this.data.process_status_data.id
+         if(this.previewState !== this.data.process_status_data.status_message || this.data.process_status_data.status_message > 7) {
+            console.log(this.data.process_status_data)
+            console.log("check state relation variables", this.previewState, this.data.process_status_data.status_message, this.state_time_elapsed);
+            this.previewState !== this.data.process_status_data.status_message && (this.previewState = this.data.process_status_data.status_message);
+            this.data.process_status_data.status_message === "Invoiced" && (this.previewState = "Invoiced");
+            this.alarm_status = false;
+            this.state_time_elapsed = 0;
+            this.stop_alarm_sound();
+        }
+        if (this.state_time_elapsed <= five_minuts) {
             this._time_elapsed.css('color', 'green');
-        } else if (time_elapsed > five_minuts && time_elapsed <= fifteen_minuts) {
+        } else if (this.state_time_elapsed > five_minuts && this.state_time_elapsed <= fifteen_minuts) {
             this._time_elapsed.css('color', 'orange');
-        } else if (time_elapsed > fifteen_minuts) {
+        } else if (this.state_time_elapsed > fifteen_minuts) {
             this._time_elapsed.css('color', 'red');
             this._time_elapsed.add_class('alert-time');
+            if (!this.alarm_status) {
+                this.alarm_status = true;
+                this.play_alarm_sound();
+            }
         }
     }
 
+    audio_play_handler() {
+        this.alarm_audio.currentTime = 0;
+        this.alarm_audio.play();
+    }
+
+    play_alarm_sound() {
+        // this.alarm_audio.addEventListener('ended', this.audio_play_handler, false)
+        window.alert("Alert start at this moment.");
+        if(!this.sound_status) {
+            this.sound_status = true;
+            this.alarm_audio.play();
+            this.intervalID = setInterval(() => {
+                this.alarm_audio.play()
+            }, this.alarm_audio.duration * 500);
+            this.alarm_audio.play()
+        }
+    }
+
+    stop_alarm_sound() {
+        this.alarm_audio.pause();
+        this.alarm_audio.currentTime = 0;
+        this.intervalID && clearInterval(this.intervalID);
+        this.sound_status = false;
+        // this.alarm_audio.removeEventListener('ended', this.audio_play_handler)
+    }
 
     get template() {
         this.detail = frappe.jshtml({

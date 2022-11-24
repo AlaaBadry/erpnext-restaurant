@@ -297,14 +297,14 @@ class RestaurantObject(Document):
     @staticmethod
     def _status(status="Pending"):
         _status = dict(
-            Pending=dict(icon="fa fa-cart-arrow-down", color="red", message="Pending", action_message="Add"),
-            Attending=dict(icon="fa fa-cart-arrow-down", color="orange", message="Attending", action_message="Sent"),
-            Sent=dict(icon="fa fa-paper-plane-o", color="steelblue", message="Whiting", action_message="Confirm"),
-            Processing=dict(icon="fa fa-gear", color="#618685", message="Processing", action_message="Complete"),
-            Completed=dict(icon="fa fa-check", color="green", message="Completed", action_message="Deliver"),
-            Delivering=dict(icon="fa fa-reply", color="#ff7b25", message="Delivering", action_message="Deliver"),
-            Delivered=dict(icon="fa fa-cutlery", color="green", message='Delivered', action_message="Invoice"),
-            Invoiced=dict(icon="fa fa-money", color="green", message="Invoiced", action_message="Invoiced"),
+            Pending=dict(icon="fa fa-cart-arrow-down", color="red", message="Pending", action_message="Add", id=1),
+            Attending=dict(icon="fa fa-cart-arrow-down", color="orange", message="Attending", action_message="Sent", id=2),
+            Sent=dict(icon="fa fa-paper-plane-o", color="steelblue", message="Whiting", action_message="Confirm", id=3),
+            Processing=dict(icon="fa fa-gear", color="#618685", message="Processing", action_message="Complete", id=4),
+            Completed=dict(icon="fa fa-check", color="green", message="Completed", action_message="Deliver", id=5),
+            Delivering=dict(icon="fa fa-reply", color="#ff7b25", message="Delivering", action_message="Deliver", id=6),
+            Delivered=dict(icon="fa fa-cutlery", color="green", message='Delivered', action_message="Invoice", id=7),
+            Invoiced=dict(icon="fa fa-money", color="green", message="Invoiced", action_message="Invoiced", id=8),
         )
         return _status[status] if status in _status else _status["Pending"]
 
